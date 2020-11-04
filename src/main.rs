@@ -97,8 +97,6 @@ fn main() {
     // Initialization of data vector
     let mut data= vec![' '; (settings.rows * settings.cols) as usize];
 
-    // display::show_game(&settings.rows, &settings.cols, &data, &2);
-
     let stdin = stdin();
 
     //setting up stdout and going into raw mode
@@ -141,7 +139,7 @@ fn main() {
             },
             // Key::Down => turn(),
             Key::Ctrl('c') => {
-                print!("{}{}", termion::cursor::Goto(1, 1), termion::clear::All);
+                print!("{}{}{}", termion::cursor::Goto(1, 1), termion::clear::All, termion::cursor::Show);
                 break;
             },
             _ => (),
