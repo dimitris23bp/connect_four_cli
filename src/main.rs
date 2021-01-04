@@ -4,10 +4,16 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 
-struct Settings {
-    rows: u8,
-    cols: u8,
-    points: u8,
+pub struct Settings {
+    pub rows: u8,
+    pub cols: u8,
+    pub points: u8,
+}
+
+pub struct Player {
+    pub name: String,
+    pub chip: char,
+    pub points: u8,
 }
 
 fn read_int() -> u8{
@@ -27,7 +33,7 @@ fn read_int() -> u8{
 
 // Choose points to win
 // Choose the size of the board
-fn menu() -> Settings {
+fn menu() -> (Player, Player, Settings) {
 
     print!("Points to win: ");
     Write::flush(&mut io::stdout()).expect("flush failed!");
@@ -41,18 +47,43 @@ fn menu() -> Settings {
     Write::flush(&mut io::stdout()).expect("flush failed!");
     let cols = read_int();
 
+    (Player {
+        name: String::from("player1"),
+        chip: 'X',
+        points: 0,
+
+    },
+    Player {
+        name: String::from("player2"),
+        chip: 'O',
+        points: 0,
+
+    },
     Settings {
         rows,
         cols,
         points
-    }
+    })
 }
 
 mod display {
+    use crate::{Settings, Player};
 
-    pub fn show_game(rows: &u8, cols: &u8, data: &Vec<Vec<char>>, position: &u8) {
-        cursor_as_line(cols, position);
-        board(rows, cols, data);
+    pub fn show_game(settings: &Settings, player1: &Player, player2: &Player, data: &Vec<Vec<char>>, position: &u8) {
+        score(&settings.points, &player1, &player2);
+        cursor_as_line(&settings.cols, position);
+        board(&settings.rows, &settings.cols, data);
+    }
+
+    pub fn score(points: &u8, player1: &Player, player2: &Player){
+
+        print!("{}: {} - {}: {} - {}/{}", 
+        player1.name, player1.points, 
+        player2.name, player2.points, 
+        player1.points + player2.points, points);
+
+        print!("\n\r");
+
     }
 
     pub fn cursor_as_line(cols: &u8, position: &u8) {
@@ -160,7 +191,7 @@ fn main() {
     println!("Welcome!");
 
     // Get the basic settings
-    let settings = menu();
+    let (player1, player2, settings) = menu();
 
     // Position of the cursor
     let mut position: u8 = 0;
@@ -181,7 +212,7 @@ fn main() {
         termion::clear::All
     );
 
-    display::show_game(&settings.rows, &settings.cols, &data, &position);
+    display::show_game(&settings, &player1, &player2,  &data, &position);
 
     print!("{}", termion::cursor::Hide);
 
@@ -199,20 +230,20 @@ fn main() {
                 if position < (settings.cols - 1) {
                     position = position + 1;
                 }
-                print!("{}{}", termion::cursor::Goto(1, 1), termion::clear::CurrentLine);
+                print!("{}{}", termion::cursor::Goto(1, 2), termion::clear::CurrentLine);
                 display::cursor_as_line(&settings.cols, &position);
             },
             Key::Left => {
                 if position > 0 {
                     position = position - 1;
                 }
-                print!("{}{}", termion::cursor::Goto(1, 1), termion::clear::CurrentLine);
+                print!("{}{}", termion::cursor::Goto(1, 2), termion::clear::CurrentLine);
                 display::cursor_as_line(&settings.cols, &position);
             },
             Key::Down => {
 
                 // Delete board
-                print!("{}{}", termion::cursor::Goto(1, 2), termion::clear::AfterCursor);
+                print!("{}{}", termion::cursor::Goto(1, 3), termion::clear::AfterCursor);
 
                 // Load chip to the data structure
                 let valid_turn: bool = load_chip(&position, &settings.rows, &chip, &mut data);
