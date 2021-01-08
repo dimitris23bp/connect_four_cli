@@ -17,16 +17,16 @@ fn read_int() -> u8{
     }
 }
 
+// Combination of player menu and game menu
 pub fn menu() -> (Player, Player, Settings) {
 
     let (player1, player2) = player_menu();
     let settings = game_menu();
 
-
     (player1, player2, settings)
 }
 
-
+// Chips are still static because changing them is boriiing
 fn player_menu() -> (Player, Player) {
 
     print!("Name of player 1:");
