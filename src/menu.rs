@@ -17,9 +17,49 @@ fn read_int() -> u8{
     }
 }
 
+pub fn menu() -> (Player, Player, Settings) {
+
+    let (player1, player2) = player_menu();
+    let settings = game_menu();
+
+
+    (player1, player2, settings)
+}
+
+
+fn player_menu() -> (Player, Player) {
+
+    print!("Name of player 1:");
+    Write::flush(&mut io::stdout()).expect("flush failed!");
+
+    let mut name1: String = String::new();
+    stdin().read_line(&mut name1).unwrap();
+    let name1 = String::from(name1.trim());
+
+    print!("Name of player 2:");
+    Write::flush(&mut io::stdout()).expect("flush failed!");
+    let mut name2: String = String::new();
+    stdin().read_line(&mut name2).unwrap();
+    let name2 = String::from(name2.trim());
+
+    (Player {
+        name: name1,
+        chip: 'X',
+        points: 0,
+
+    },
+    Player {
+        name: name2,
+        chip: 'O',
+        points: 0,
+
+    })
+
+}
+
 // Choose points to win
 // Choose the size of the board
-pub fn menu() -> (Player, Player, Settings) {
+fn game_menu() -> Settings {
 
     print!("Points to win: ");
     Write::flush(&mut io::stdout()).expect("flush failed!");
@@ -34,21 +74,9 @@ pub fn menu() -> (Player, Player, Settings) {
     let cols = read_int();
 
     // Return the players and the settings of the game all at once
-    (Player {
-        name: String::from("player1"),
-        chip: 'X',
-        points: 0,
-
-    },
-    Player {
-        name: String::from("player2"),
-        chip: 'O',
-        points: 0,
-
-    },
     Settings {
         rows,
         cols,
         points
-    })
+    }
 }
